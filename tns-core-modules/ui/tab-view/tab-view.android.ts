@@ -224,7 +224,7 @@ function initializeNativeClasses() {
             }
         }
     }
-    
+
     PagerAdapter = FragmentPagerAdapter;
 }
 
@@ -547,12 +547,26 @@ export class TabView extends TabViewBase {
 
     public _onRootViewReset(): void {
         super._onRootViewReset();
-        
+
         // call this AFTER the super call to ensure descendants apply their rootview-reset logic first
         // i.e. in a scenario with tab frames let the frames cleanup their fragments first, and then
         // cleanup the tab fragments to avoid
         // android.content.res.Resources$NotFoundException: Unable to find resource ID #0xfffffff6
         this.disposeCurrentFragments();
+    }
+
+    public _onLivesync(context?: ModuleContext): boolean {
+        super._onLivesync(context);
+        console.log("---> TabView._onLivesync()", context);
+
+        const selectedIndex = this.selectedIndex;
+        const items = this.items;
+        const selectedTabViewItem = items[selectedIndex];
+        const view = selectedTabViewItem.view;
+
+        // Frame, Layout, anything ...
+        view._onLivesync();
+        return true;
     }
 
     private disposeCurrentFragments(): void {
